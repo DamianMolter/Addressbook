@@ -13,6 +13,11 @@ struct Friend {
     string name, surname, phoneNumber, address, mail;
 };
 
+struct User {
+    int id;
+    string login, password;
+};
+
 string loadLine() {
     string input;
     cin.sync();
@@ -308,11 +313,76 @@ int addressBookMainMenu() {
 
 }
 
+vector <User> loadAllUsers() {
+
+
+    User user;
+    vector <User> users;
+    fstream usersList;
+    string line;
+    int fragmentNumber = 1;
+    usersList.open("users.txt", ios::in);
+
+    while(getline(usersList, line)) {
+        while(!line.empty()) {
+            int borderPosition = line.find('|');
+            string lineFragment = line.substr(0, borderPosition);
+
+            switch(fragmentNumber) {
+            case 1:
+                user.id = stoi(lineFragment);
+                break;
+            case 2:
+                user.login = lineFragment;
+                break;
+            case 3:
+                user.password= lineFragment;
+                line.clear();
+                fragmentNumber = 0;
+                users.push_back(user);
+                break;
+            }
+            line.erase(0, borderPosition + 1);
+            fragmentNumber++;
+        }
+    }
+    usersList.close();
+
+    return users;
+}
+
+
+void registerNewUser() {
+
+
+    User user;
+    vector <User> users = loadAllUsers();
+    system("cls");
+    cout << "KSIAZKA ADRESOWA by MOLTER IT SOLUTIONS " << endl;
+    cout << "Podaj login" << endl;
+    cin >> user.login;
+    cout << "Podaj haslo" << endl;
+    cin >> user.password;
+    cout << "Konto zostalo pomyslnie zalozone" << endl;
+    users.size() != 0 ? user.id = users[users.size() - 1].id + 1 : user.id = 1;
+    system("pause");
+
+    fstream usersList;
+
+    usersList.open("users.txt", ios::app);
+    usersList << user.id << "|" << user.login << "|" << user.password << endl;
+    usersList.close();
+
+
+
+}
+
+
 int main() {
 
     int loginMenuOptionNumber;
 
-    while(1){
+    while(1) {
         system("cls");
         cout << "KSIAZKA ADRESOWA by MOLTER IT SOLUTIONS " << endl;
         cout << "Witaj w ksiazce adresowej! Powiedz Przyjacielu i wejdz!" << endl;
@@ -321,12 +391,13 @@ int main() {
         cout << "3. Wyjdz z programu." << endl;
 
         cin >> loginMenuOptionNumber;
-        switch(loginMenuOptionNumber){
+        switch(loginMenuOptionNumber) {
 
         case 1:
             addressBookMainMenu();
             break;
         case 2:
+            registerNewUser();
             break;
         case 3:
             cout << "Do zobaczenia wkrotce :)" << endl;
