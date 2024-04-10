@@ -249,27 +249,28 @@ void deleteContact(vector <Friend> &friends) {
     }
 }
 
-int main() {
-    int menuOptionNumber;
+int addressBookMainMenu() {
+
+    int addressBookOptionNumber;
     vector <Friend> friends;
     loadData(friends);
 
     while(1) {
         system("cls");
         cout << "KSIAZKA ADRESOWA by MOLTER IT SOLUTIONS " << endl;
-        cout << "Witaj w ksiazce adresowej Przyjacielu! Wybierz madrze!" << endl;
+        cout << "Witaj w ksiazce adresowej! Powiedz Przyjacielu i wejdz!!" << endl;
         cout << "1. Dodaj kontakt." << endl;
         cout << "2. Wyszukaj po imieniu." << endl;
         cout << "3. Wyszukaj po nazwisku." << endl;
         cout << "4. Wyswietl wszystkie kontakty." << endl;
         cout << "5. Usun adresata." << endl;
         cout << "6. Edytuj adresata" << endl;
-        cout << "7. Zakoncz program." << endl << endl;
+        cout << "7. Wyloguj sie." << endl << endl;
 
-        cin >> menuOptionNumber;
+        cin >> addressBookOptionNumber;
         cout << endl;
 
-        switch(menuOptionNumber) {
+        switch(addressBookOptionNumber) {
         case 1:
             addContactToAddressbook(friends);
             break;
@@ -302,6 +303,34 @@ int main() {
             cout << "Wybierz wlasciwa pozycje menu!" << endl;
             sleep(1);
             break;
+        }
+    }
+
+}
+
+int main() {
+
+    int loginMenuOptionNumber;
+
+    while(1){
+        system("cls");
+        cout << "KSIAZKA ADRESOWA by MOLTER IT SOLUTIONS " << endl;
+        cout << "Witaj w ksiazce adresowej! Powiedz Przyjacielu i wejdz!" << endl;
+        cout << "1. Logowanie." << endl;
+        cout << "2. Rejestracja." << endl;
+        cout << "3. Wyjdz z programu." << endl;
+
+        cin >> loginMenuOptionNumber;
+        switch(loginMenuOptionNumber){
+
+        case 1:
+            addressBookMainMenu();
+            break;
+        case 2:
+            break;
+        case 3:
+            cout << "Do zobaczenia wkrotce :)" << endl;
+            return 0;
         }
     }
 }
