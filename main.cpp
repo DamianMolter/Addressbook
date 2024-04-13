@@ -254,7 +254,7 @@ void deleteContact(vector <Friend> &friends) {
     }
 }
 
-int addressBookMainMenu() {
+int addressBookMainMenu(int loggedUserId) {
 
     int addressBookOptionNumber;
     vector <Friend> friends;
@@ -263,6 +263,7 @@ int addressBookMainMenu() {
     while(1) {
         system("cls");
         cout << "KSIAZKA ADRESOWA by MOLTER IT SOLUTIONS " << endl;
+        cout << "Id zalogowanego uzytkownika: " << loggedUserId << endl;
         cout << "Witaj w ksiazce adresowej! Powiedz Przyjacielu i wejdz!!" << endl;
         cout << "1. Dodaj kontakt." << endl;
         cout << "2. Wyszukaj po imieniu." << endl;
@@ -350,10 +351,10 @@ vector <User> loadAllUsers() {
     return users;
 }
 
-bool checkRepeatingLogin(vector <User> users, string login){
+bool checkRepeatingLogin(vector <User> users, string login) {
     bool decision;
-    for (size_t i = 0; i < users.size(); i++){
-        if(users[i].login == login){
+    for (size_t i = 0; i < users.size(); i++) {
+        if(users[i].login == login) {
             decision = true;
             break;
         } else {
@@ -371,14 +372,13 @@ void registerNewUser() {
     vector <User> users = loadAllUsers();
     system("cls");
     cout << "KSIAZKA ADRESOWA by MOLTER IT SOLUTIONS " << endl;
-    cout << "Podaj login" << endl;
+    cout << "Podaj login:" << endl;
     cin >> login;
-    while(checkRepeatingLogin(users, login)){
+    while(checkRepeatingLogin(users, login)) {
         cout << "Podany login jest juz zajety, podaj inny!" << endl;
         cin >> login;
     }
-
-    cout << "Podaj haslo" << endl;
+    cout << "Podaj haslo:" << endl;
     cin >> password;
     cout << "Konto zostalo pomyslnie zalozone" << endl;
     users.size() != 0 ? userId = users[users.size() - 1].id + 1 : userId = 1;
@@ -391,9 +391,43 @@ void registerNewUser() {
     usersList.close();
 }
 
+int checkCorrectLoginAndPassword(vector <User> users,string login,string password){
+    int loggedUserId;
+    for(size_t i = 0; i < users.size(); i++){
+        if(users[i].login == login && users[i].password == password){
+            loggedUserId = users[i].id;
+            break;
+        } else {
+            loggedUserId = -1;
+        }
+    }
+    return loggedUserId;
+}
+
+int loginToAddressbook () {
+    string login, password;
+    int loggedUserId = -1;
+    vector <User> users = loadAllUsers();
+    do{
+        cout << "Podaj login (Wpisz 0 aby anulowac.):" << endl;
+        cin >> login;
+        if(login == "0"){
+            break;
+        }
+        cout << "Podaj haslo:" << endl;
+        cin >> password;
+        cout << "Dane logowania niepoprawne! Sproboj ponownie!" << endl;
+        loggedUserId = checkCorrectLoginAndPassword(users, login, password);
+
+    }while(loggedUserId < 0);
+
+    return loggedUserId;
+}
+
 int main() {
 
     int loginMenuOptionNumber;
+    int loggedUserId = -1;
 
     while(1) {
         system("cls");
@@ -407,7 +441,10 @@ int main() {
         switch(loginMenuOptionNumber) {
 
         case 1:
-            addressBookMainMenu();
+            loggedUserId = loginToAddressbook();
+            if(loggedUserId > 0){
+                addressBookMainMenu(loggedUserId);
+            };
             break;
         case 2:
             registerNewUser();
