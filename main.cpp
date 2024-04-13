@@ -315,7 +315,6 @@ int addressBookMainMenu() {
 
 vector <User> loadAllUsers() {
 
-
     User user;
     vector <User> users;
     fstream usersList;
@@ -351,32 +350,46 @@ vector <User> loadAllUsers() {
     return users;
 }
 
+bool checkRepeatingLogin(vector <User> users, string login){
+    bool decision;
+    for (size_t i = 0; i < users.size(); i++){
+        if(users[i].login == login){
+            decision = true;
+            break;
+        } else {
+            decision = false;
+        }
+    }
+    return decision;
+}
 
 void registerNewUser() {
 
-
+    size_t userId;
+    string login, password;
     User user;
     vector <User> users = loadAllUsers();
     system("cls");
     cout << "KSIAZKA ADRESOWA by MOLTER IT SOLUTIONS " << endl;
     cout << "Podaj login" << endl;
-    cin >> user.login;
+    cin >> login;
+    while(checkRepeatingLogin(users, login)){
+        cout << "Podany login jest juz zajety, podaj inny!" << endl;
+        cin >> login;
+    }
+
     cout << "Podaj haslo" << endl;
-    cin >> user.password;
+    cin >> password;
     cout << "Konto zostalo pomyslnie zalozone" << endl;
-    users.size() != 0 ? user.id = users[users.size() - 1].id + 1 : user.id = 1;
+    users.size() != 0 ? userId = users[users.size() - 1].id + 1 : userId = 1;
     system("pause");
 
     fstream usersList;
 
     usersList.open("users.txt", ios::app);
-    usersList << user.id << "|" << user.login << "|" << user.password << endl;
+    usersList << userId << "|" << login << "|" << password << endl;
     usersList.close();
-
-
-
 }
-
 
 int main() {
 
