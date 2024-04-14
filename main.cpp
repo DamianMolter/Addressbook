@@ -154,7 +154,7 @@ int findWantedID (vector <Friend> &friends) {
     }
 
     if (!existenceInAddressbook) {
-        cout << "Uzytkownik o podanym ID nie istnieje." << endl;
+        cout << "Adresat o podanym ID nie istnieje." << endl;
         cout << "Wcisnij dowolny przycisk, aby powrocic do menu glownego." << endl;
         system("pause");
         return -1;
@@ -252,66 +252,6 @@ void deleteContact(vector <Friend> &friends) {
         }
         overwriteAddressbookFile (friends);
     }
-}
-
-int addressBookMainMenu(int loggedUserId) {
-
-    int addressBookOptionNumber;
-    vector <Friend> friends;
-    loadData(friends);
-
-    while(1) {
-        system("cls");
-        cout << "KSIAZKA ADRESOWA by MOLTER IT SOLUTIONS " << endl;
-        cout << "Id zalogowanego uzytkownika: " << loggedUserId << endl;
-        cout << "Witaj w ksiazce adresowej! Powiedz Przyjacielu i wejdz!!" << endl;
-        cout << "1. Dodaj kontakt." << endl;
-        cout << "2. Wyszukaj po imieniu." << endl;
-        cout << "3. Wyszukaj po nazwisku." << endl;
-        cout << "4. Wyswietl wszystkie kontakty." << endl;
-        cout << "5. Usun adresata." << endl;
-        cout << "6. Edytuj adresata" << endl;
-        cout << "7. Wyloguj sie." << endl << endl;
-
-        cin >> addressBookOptionNumber;
-        cout << endl;
-
-        switch(addressBookOptionNumber) {
-        case 1:
-            addContactToAddressbook(friends);
-            break;
-
-        case 2:
-            searchContactByName(friends);
-            break;
-
-        case 3:
-            searchContactBySurname(friends);
-            break;
-
-        case 4:
-            displayAllContacts(friends);
-            break;
-
-        case 5:
-            deleteContact(friends);
-            break;
-
-        case 6:
-            editContact(friends);
-            break;
-
-        case 7:
-            cout << "Pomyslnie sie wylogowales. Do zobaczenia :)" << endl;
-            return 0;
-
-        default:
-            cout << "Wybierz wlasciwa pozycje menu!" << endl;
-            sleep(1);
-            break;
-        }
-    }
-
 }
 
 vector <User> loadAllUsers() {
@@ -423,6 +363,120 @@ int loginToAddressbook () {
 
     return loggedUserId;
 }
+
+int findUserPosition (vector <User> &users, int loggedUserId) {
+
+    int wantedID = loggedUserId;
+    bool existenceInUsersList = 0;
+    for(size_t i = 0; i < users.size(); i++) {
+
+        if(users[i].id == wantedID) {
+            wantedID = i;
+            existenceInUsersList = 1;
+            break;
+        }
+    }
+
+    if (!existenceInUsersList) {
+        cout << "Uzytkownik o podanym ID nie istnieje." << endl;
+        cout << "Wcisnij dowolny przycisk, aby powrocic do menu glownego." << endl;
+        system("pause");
+        return -1;
+    }
+    return wantedID;
+}
+
+void overwriteUsersList (vector <User> &users) {
+
+    fstream userList;
+    userList.open("users.txt", ios::out | ios::trunc);
+
+    for(size_t i = 0; i < users.size(); i++) {
+        userList << users[i].id << '|' << users[i].login << '|' << users[i].password << endl;
+    }
+    userList.close();
+}
+
+void changePassword (int loggedUserId){
+
+    vector <User> users = loadAllUsers();
+    int userPosition = findUserPosition(users, loggedUserId);
+    string newPassword;
+    cout << "Podaj nowe haslo" << endl;
+    cin >> newPassword;
+
+    users[userPosition].password = newPassword;
+    cout << "Haslo zostalo zmienione!" << endl;
+    overwriteUsersList(users);
+    system("pause");
+
+}
+
+int addressBookMainMenu(int loggedUserId) {
+
+    int addressBookOptionNumber;
+    vector <Friend> friends;
+    loadData(friends);
+
+    while(1) {
+        system("cls");
+        cout << "KSIAZKA ADRESOWA by MOLTER IT SOLUTIONS " << endl;
+        cout << "Id zalogowanego uzytkownika: " << loggedUserId << endl;
+        cout << "Witaj w ksiazce adresowej! Powiedz Przyjacielu i wejdz!!" << endl;
+        cout << "1. Dodaj kontakt." << endl;
+        cout << "2. Wyszukaj po imieniu." << endl;
+        cout << "3. Wyszukaj po nazwisku." << endl;
+        cout << "4. Wyswietl wszystkie kontakty." << endl;
+        cout << "5. Usun adresata." << endl;
+        cout << "6. Edytuj adresata." << endl;
+        cout << "7. Zmien haslo." << endl;
+        cout << "8. Wyloguj sie." << endl << endl;
+
+        cin >> addressBookOptionNumber;
+        cout << endl;
+
+        switch(addressBookOptionNumber) {
+        case 1:
+            addContactToAddressbook(friends);
+            break;
+
+        case 2:
+            searchContactByName(friends);
+            break;
+
+        case 3:
+            searchContactBySurname(friends);
+            break;
+
+        case 4:
+            displayAllContacts(friends);
+            break;
+
+        case 5:
+            deleteContact(friends);
+            break;
+
+        case 6:
+            editContact(friends);
+            break;
+
+        case 7:
+            changePassword(loggedUserId);
+            break;
+
+        case 8:
+            cout << "Pomyslnie sie wylogowales. Do zobaczenia :)" << endl;
+            return 0;
+
+        default:
+            cout << "Wybierz wlasciwa pozycje menu!" << endl;
+            sleep(1);
+            break;
+        }
+    }
+
+}
+
 
 int main() {
 
