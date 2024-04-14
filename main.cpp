@@ -25,10 +25,11 @@ string loadLine() {
     return input;
 }
 
-void loadData(vector <Friend> &friends) {
+void loadData(vector <Friend> &friends, int loggedUserId) {
     Friend singleContact;
     string line;
     int fragmentNumber = 1;
+    int ownerOfContactId;
 
     fstream addressBook;
     addressBook.open("addressBook.txt", ios::in | ios::app);
@@ -42,22 +43,27 @@ void loadData(vector <Friend> &friends) {
                 singleContact.id = stoi(lineFragment);
                 break;
             case 2:
-                singleContact.name = lineFragment;
+                ownerOfContactId = stoi(lineFragment);
                 break;
             case 3:
-                singleContact.surname = lineFragment;
+                singleContact.name = lineFragment;
                 break;
             case 4:
-                singleContact.phoneNumber = lineFragment;
+                singleContact.surname = lineFragment;
                 break;
             case 5:
-                singleContact.address = lineFragment;
+                singleContact.phoneNumber = lineFragment;
                 break;
             case 6:
+                singleContact.address = lineFragment;
+                break;
+            case 7:
                 singleContact.mail = line;
                 line.clear();
                 fragmentNumber = 0;
-                friends.push_back(singleContact);
+                if(ownerOfContactId == loggedUserId){
+                    friends.push_back(singleContact);
+                }
                 break;
             }
             line.erase(0, borderPosition + 1);
@@ -67,7 +73,21 @@ void loadData(vector <Friend> &friends) {
     addressBook.close();
 }
 
-void addContactToAddressbook(vector <Friend> &friends) {
+int countAllContacts(){
+
+    fstream addressBook;
+    string line;
+    int contactCount = 0;
+    addressBook.open("addressBook.txt", ios::in);
+    while(getline(addressBook, line)) {
+        contactCount++;
+    }
+    addressBook.close();
+
+    return contactCount;
+}
+
+void addContactToAddressbook(vector <Friend> &friends, int loggedUserId, int contactCount) {
     Friend singleContact;
     fstream addressBook;
 
@@ -81,11 +101,10 @@ void addContactToAddressbook(vector <Friend> &friends) {
     singleContact.address = loadLine();
     cout << "Podaj adres e-mail: " << endl;
     singleContact.mail = loadLine();
-
-    friends.size() != 0 ? singleContact.id = friends[friends.size() - 1].id + 1 : singleContact.id = 1;
+    singleContact.id = contactCount + 1;
 
     addressBook.open("addressBook.txt", ios::out | ios::app);
-    addressBook << singleContact.id << '|' << singleContact.name << '|' << singleContact.surname << '|';
+    addressBook << singleContact.id << '|' << loggedUserId << '|' << singleContact.name << '|' << singleContact.surname << '|';
     addressBook << singleContact.phoneNumber << '|' << singleContact.address << '|' << singleContact.mail << endl;
     addressBook.close();
 
@@ -414,9 +433,10 @@ void changePassword (int loggedUserId){
 
 int addressBookMainMenu(int loggedUserId) {
 
+    int contactCount = countAllContacts();
     int addressBookOptionNumber;
     vector <Friend> friends;
-    loadData(friends);
+    loadData(friends, loggedUserId);
 
     while(1) {
         system("cls");
@@ -437,7 +457,7 @@ int addressBookMainMenu(int loggedUserId) {
 
         switch(addressBookOptionNumber) {
         case 1:
-            addContactToAddressbook(friends);
+            addContactToAddressbook(friends, loggedUserId, contactCount);
             break;
 
         case 2:
