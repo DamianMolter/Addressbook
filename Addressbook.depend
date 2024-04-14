@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1713045355 source:c:\projekty\addressbook\main.cpp
+1713122385 source:c:\projekty\addressbook\main.cpp
 	<iostream>
 	<string>
 	<windows.h>
