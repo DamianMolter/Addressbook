@@ -77,10 +77,12 @@ int countAllContacts(){
 
     fstream addressBook;
     string line;
+    size_t verticalBarPosition;
     int contactCount = 0;
     addressBook.open("addressBook.txt", ios::in);
     while(getline(addressBook, line)) {
-        contactCount++;
+        verticalBarPosition = line.find('|');
+        contactCount = stoi(line.substr(0, verticalBarPosition));
     }
     addressBook.close();
 
