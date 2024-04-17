@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <fstream>
 #include <vector>
+#include <stdio.h>
 
 using namespace std;
 
@@ -58,7 +59,7 @@ void loadData(vector <Friend> &friends, int loggedUserId) {
                 singleContact.address = lineFragment;
                 break;
             case 7:
-                singleContact.mail = line;
+                singleContact.mail = line.substr(0, line.find('|'));
                 line.clear();
                 fragmentNumber = 0;
                 if(ownerOfContactId == loggedUserId){
@@ -103,11 +104,11 @@ void addContactToAddressbook(vector <Friend> &friends, int loggedUserId, int con
     singleContact.address = loadLine();
     cout << "Podaj adres e-mail: " << endl;
     singleContact.mail = loadLine();
-    singleContact.id = contactCount + 1;
+    singleContact.id = countAllContacts() + 1;
 
     addressBook.open("addressBook.txt", ios::out | ios::app);
     addressBook << singleContact.id << '|' << loggedUserId << '|' << singleContact.name << '|' << singleContact.surname << '|';
-    addressBook << singleContact.phoneNumber << '|' << singleContact.address << '|' << singleContact.mail << endl;
+    addressBook << singleContact.phoneNumber << '|' << singleContact.address << '|' << singleContact.mail  << "|" << endl;
     addressBook.close();
 
     friends.push_back(singleContact);
@@ -229,19 +230,34 @@ void changeData (int contactPosition, vector <Friend> &friends) {
     }
 }
 
-void overwriteAddressbookFile (vector <Friend> friends) {
+void editAddressbookFile (vector <Friend> friends, int contactPosition, int loggedUserId) {
 
-    fstream addressBook;
-    addressBook.open("addressBook.txt", ios::out | ios::trunc);
+    fstream newAddressBook, oldAddressBook;
+    string line;
 
-    for(size_t i = 0; i < friends.size(); i++) {
-        addressBook << friends[i].id << '|' << friends[i].name << '|' << friends[i].surname << '|';
-        addressBook << friends[i].phoneNumber << '|' << friends[i].address << '|' << friends[i].mail << endl;
-    }
-    addressBook.close();
+    oldAddressBook.open("addressBook.txt", ios::in);
+    newAddressBook.open("addressBook_new.txt", ios::out | ios::trunc);
+
+    while(getline(oldAddressBook, line)){
+
+        size_t firstVerticalBarPosition = line.find('|');
+        int contactId = stoi(line.substr(0, firstVerticalBarPosition));
+
+        if(friends[contactPosition].id == contactId){
+        newAddressBook << friends[contactPosition].id << '|' << loggedUserId << '|';
+        newAddressBook << friends[contactPosition].name << '|' << friends[contactPosition].surname << '|';
+        newAddressBook << friends[contactPosition].phoneNumber << '|' << friends[contactPosition].address << '|' << friends[contactPosition].mail << endl;
+        } else {
+        newAddressBook << line << endl;
+        }
+}
+    oldAddressBook.close();
+    newAddressBook.close();
+    remove("addressBook.txt");
+    rename("addressBook_new.txt", "addressBook.txt");
 }
 
-void editContact(vector <Friend> &friends) {
+void editContact(vector <Friend> &friends, int loggedUserId) {
 
     cout << "Wybierz ID adresata: ";
     int contactPosition = findWantedID (friends);
@@ -249,11 +265,11 @@ void editContact(vector <Friend> &friends) {
         displayContact(contactPosition, friends);
         displayEditMenu();
         changeData (contactPosition, friends);
-        overwriteAddressbookFile (friends);
+        editAddressbookFile (friends, contactPosition, loggedUserId);
     }
 }
 
-void deleteContact(vector <Friend> &friends) {
+void deleteContact(vector <Friend> &friends, int loggedUserId) {
 
     cout << "Wpisz ID uzytkownika:" << endl;
     int contactPosition = findWantedID (friends);
@@ -271,7 +287,7 @@ void deleteContact(vector <Friend> &friends) {
         case 'n':
             break;
         }
-        overwriteAddressbookFile (friends);
+        editAddressbookFile (friends,contactPosition, loggedUserId);
     }
 }
 
@@ -348,7 +364,7 @@ void registerNewUser() {
     fstream usersList;
 
     usersList.open("users.txt", ios::app);
-    usersList << userId << "|" << login << "|" << password << endl;
+    usersList << userId << "|" << login << "|" << password << "|" << endl;
     usersList.close();
 }
 
@@ -475,11 +491,11 @@ int addressBookMainMenu(int loggedUserId) {
             break;
 
         case 5:
-            deleteContact(friends);
+            deleteContact(friends, loggedUserId);
             break;
 
         case 6:
-            editContact(friends);
+            editContact(friends, loggedUserId);
             break;
 
         case 7:
