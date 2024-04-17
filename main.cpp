@@ -38,7 +38,6 @@ void loadData(vector <Friend> &friends, int loggedUserId) {
         while(!line.empty()) {
             int borderPosition = line.find('|');
             string lineFragment = line.substr(0, borderPosition);
-
             switch(fragmentNumber) {
             case 1:
                 singleContact.id = stoi(lineFragment);
@@ -269,6 +268,30 @@ void editContact(vector <Friend> &friends, int loggedUserId) {
     }
 }
 
+
+void deleteFromAddressbookFile (vector <Friend> friends, int contactPosition, int loggedUserId) {
+
+    fstream newAddressBook, oldAddressBook;
+    string line;
+
+    oldAddressBook.open("addressBook.txt", ios::in);
+    newAddressBook.open("addressBook_new.txt", ios::out | ios::trunc);
+
+    while(getline(oldAddressBook, line)){
+
+        size_t firstVerticalBarPosition = line.find('|');
+        int contactId = stoi(line.substr(0, firstVerticalBarPosition));
+
+        if(friends[contactPosition].id != contactId){
+        newAddressBook << line << endl;
+        }
+}
+    oldAddressBook.close();
+    newAddressBook.close();
+    remove("addressBook.txt");
+    rename("addressBook_new.txt", "addressBook.txt");
+}
+
 void deleteContact(vector <Friend> &friends, int loggedUserId) {
 
     cout << "Wpisz ID uzytkownika:" << endl;
@@ -280,6 +303,7 @@ void deleteContact(vector <Friend> &friends, int loggedUserId) {
         cin >> decision;
         switch(decision) {
         case 't':
+            deleteFromAddressbookFile (friends,contactPosition, loggedUserId);
             friends.erase(friends.begin() + contactPosition);
             cout << "Kontakt pomyslnie usuniety" << endl;
             system("pause");
@@ -287,7 +311,6 @@ void deleteContact(vector <Friend> &friends, int loggedUserId) {
         case 'n':
             break;
         }
-        editAddressbookFile (friends,contactPosition, loggedUserId);
     }
 }
 
