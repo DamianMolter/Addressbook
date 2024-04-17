@@ -26,8 +26,9 @@ string loadLine() {
     return input;
 }
 
-void loadData(vector <Friend> &friends, int loggedUserId) {
+vector <Friend> loadData(int loggedUserId) {
     Friend singleContact;
+    vector <Friend> friends;
     string line;
     int fragmentNumber = 1;
     int ownerOfContactId;
@@ -36,8 +37,8 @@ void loadData(vector <Friend> &friends, int loggedUserId) {
     addressBook.open("addressBook.txt", ios::in | ios::app);
     while(getline(addressBook, line)) {
         while(!line.empty()) {
-            int borderPosition = line.find('|');
-            string lineFragment = line.substr(0, borderPosition);
+            int verticalBarPosition = line.find('|');
+            string lineFragment = line.substr(0, verticalBarPosition);
             switch(fragmentNumber) {
             case 1:
                 singleContact.id = stoi(lineFragment);
@@ -61,19 +62,20 @@ void loadData(vector <Friend> &friends, int loggedUserId) {
                 singleContact.mail = line.substr(0, line.find('|'));
                 line.clear();
                 fragmentNumber = 0;
-                if(ownerOfContactId == loggedUserId){
+                if(ownerOfContactId == loggedUserId) {
                     friends.push_back(singleContact);
                 }
                 break;
             }
-            line.erase(0, borderPosition + 1);
+            line.erase(0, verticalBarPosition + 1);
             fragmentNumber++;
         }
     }
     addressBook.close();
+    return friends;
 }
 
-int countAllContacts(){
+int countAllContacts() {
 
     fstream addressBook;
     string line;
@@ -198,33 +200,33 @@ void changeData (int contactPosition, vector <Friend> &friends) {
 
     int optionNumberToChange;
     cin >> optionNumberToChange;
+    cout << "Podaj nowa wartosc." << endl;
     switch(optionNumberToChange) {
     case 1:
-        cout << "Podaj nowa wartosc." << endl;
         friends[contactPosition].name = loadLine();
         cout << "Dane zostaly pomyslnie zmienione." << endl;
         break;
     case 2:
-        cout << "Podaj nowa wartosc." << endl;
         friends[contactPosition].surname = loadLine();
         cout << "Dane zostaly pomyslnie zmienione." << endl;
         break;
     case 3:
-        cout << "Podaj nowa wartosc." << endl;
         friends[contactPosition].phoneNumber = loadLine();
         cout << "Dane zostaly pomyslnie zmienione." << endl;
         break;
     case 4:
-        cout << "Podaj nowa wartosc." << endl;
         friends[contactPosition].address = loadLine();
         cout << "Dane zostaly pomyslnie zmienione." << endl;
         break;
     case 5:
-        cout << "Podaj nowa wartosc." << endl;
         friends[contactPosition].mail = loadLine();
         cout << "Dane zostaly pomyslnie zmienione." << endl;
         break;
     case 6:
+        break;
+    default:
+        cout << "Wybierz wlasciwa pozycje menu!" << endl;
+        sleep(1);
         break;
     }
 }
@@ -233,23 +235,19 @@ void editAddressbookFile (vector <Friend> friends, int contactPosition, int logg
 
     fstream newAddressBook, oldAddressBook;
     string line;
-
     oldAddressBook.open("addressBook.txt", ios::in);
-    newAddressBook.open("addressBook_new.txt", ios::out | ios::trunc);
-
-    while(getline(oldAddressBook, line)){
-
+    newAddressBook.open("addressBook_new.txt", ios::out);
+    while(getline(oldAddressBook, line)) {
         size_t firstVerticalBarPosition = line.find('|');
         int contactId = stoi(line.substr(0, firstVerticalBarPosition));
-
-        if(friends[contactPosition].id == contactId){
-        newAddressBook << friends[contactPosition].id << '|' << loggedUserId << '|';
-        newAddressBook << friends[contactPosition].name << '|' << friends[contactPosition].surname << '|';
-        newAddressBook << friends[contactPosition].phoneNumber << '|' << friends[contactPosition].address << '|' << friends[contactPosition].mail << endl;
+        if(friends[contactPosition].id == contactId) {
+            newAddressBook << friends[contactPosition].id << '|' << loggedUserId << '|'<< friends[contactPosition].name << '|';
+            newAddressBook << friends[contactPosition].surname << '|' << friends[contactPosition].phoneNumber << '|';
+            newAddressBook << friends[contactPosition].address << '|' << friends[contactPosition].mail << endl;
         } else {
-        newAddressBook << line << endl;
+            newAddressBook << line << endl;
         }
-}
+    }
     oldAddressBook.close();
     newAddressBook.close();
     remove("addressBook.txt");
@@ -268,24 +266,19 @@ void editContact(vector <Friend> &friends, int loggedUserId) {
     }
 }
 
-
 void deleteFromAddressbookFile (vector <Friend> friends, int contactPosition, int loggedUserId) {
 
     fstream newAddressBook, oldAddressBook;
     string line;
-
     oldAddressBook.open("addressBook.txt", ios::in);
     newAddressBook.open("addressBook_new.txt", ios::out | ios::trunc);
-
-    while(getline(oldAddressBook, line)){
-
+    while(getline(oldAddressBook, line)) {
         size_t firstVerticalBarPosition = line.find('|');
         int contactId = stoi(line.substr(0, firstVerticalBarPosition));
-
-        if(friends[contactPosition].id != contactId){
-        newAddressBook << line << endl;
+        if(friends[contactPosition].id != contactId) {
+            newAddressBook << line << endl;
         }
-}
+    }
     oldAddressBook.close();
     newAddressBook.close();
     remove("addressBook.txt");
@@ -322,12 +315,10 @@ vector <User> loadAllUsers() {
     string line;
     int fragmentNumber = 1;
     usersList.open("users.txt", ios::in);
-
     while(getline(usersList, line)) {
         while(!line.empty()) {
-            int borderPosition = line.find('|');
-            string lineFragment = line.substr(0, borderPosition);
-
+            int verticalBarPosition = line.find('|');
+            string lineFragment = line.substr(0, verticalBarPosition);
             switch(fragmentNumber) {
             case 1:
                 user.id = stoi(lineFragment);
@@ -336,18 +327,17 @@ vector <User> loadAllUsers() {
                 user.login = lineFragment;
                 break;
             case 3:
-                user.password= lineFragment;
+                user.password = line;
                 line.clear();
                 fragmentNumber = 0;
                 users.push_back(user);
                 break;
             }
-            line.erase(0, borderPosition + 1);
+            line.erase(0, verticalBarPosition + 1);
             fragmentNumber++;
         }
     }
     usersList.close();
-
     return users;
 }
 
@@ -364,8 +354,14 @@ bool checkRepeatingLogin(vector <User> users, string login) {
     return decision;
 }
 
-void registerNewUser() {
+void saveNewUserInFile(size_t userId, string login, string password){
+    fstream usersList;
+    usersList.open("users.txt", ios::app);
+    usersList << userId << "|" << login << "|" << password << endl;
+    usersList.close();
+}
 
+void registerNewUser() {
     size_t userId;
     string login, password;
     User user;
@@ -383,18 +379,13 @@ void registerNewUser() {
     cout << "Konto zostalo pomyslnie zalozone" << endl;
     users.size() != 0 ? userId = users[users.size() - 1].id + 1 : userId = 1;
     system("pause");
-
-    fstream usersList;
-
-    usersList.open("users.txt", ios::app);
-    usersList << userId << "|" << login << "|" << password << "|" << endl;
-    usersList.close();
+    saveNewUserInFile(userId, login, password);
 }
 
-int checkCorrectLoginAndPassword(vector <User> users,string login,string password){
+int checkCorrectLoginAndPassword(vector <User> users,string login,string password) {
     int loggedUserId;
-    for(size_t i = 0; i < users.size(); i++){
-        if(users[i].login == login && users[i].password == password){
+    for(size_t i = 0; i < users.size(); i++) {
+        if(users[i].login == login && users[i].password == password) {
             loggedUserId = users[i].id;
             break;
         } else {
@@ -408,63 +399,53 @@ int loginToAddressbook () {
     string login, password;
     int loggedUserId = -1;
     vector <User> users = loadAllUsers();
-    do{
-        cout << "Podaj login (Wpisz 0 aby anulowac.):" << endl;
+    do {
+        cout << "Podaj login (Wpisz 0 aby wrocic do glownego menu.):" << endl;
         cin >> login;
-        if(login == "0"){
+        if(login == "0") {
             break;
         }
         cout << "Podaj haslo:" << endl;
         cin >> password;
         cout << "Dane logowania niepoprawne! Sproboj ponownie!" << endl;
         loggedUserId = checkCorrectLoginAndPassword(users, login, password);
-
-    }while(loggedUserId < 0);
-
+    } while(loggedUserId < 0);
     return loggedUserId;
 }
 
-int findUserPosition (vector <User> &users, int loggedUserId) {
-
-    int wantedID = loggedUserId;
+int findUserPosition (vector <User> users, int loggedUserId) {
     bool existenceInUsersList = 0;
     for(size_t i = 0; i < users.size(); i++) {
-
-        if(users[i].id == wantedID) {
-            wantedID = i;
+        if(users[i].id == loggedUserId) {
+            loggedUserId = i;
             existenceInUsersList = 1;
             break;
         }
     }
-
     if (!existenceInUsersList) {
         cout << "Uzytkownik o podanym ID nie istnieje." << endl;
         cout << "Wcisnij dowolny przycisk, aby powrocic do menu glownego." << endl;
         system("pause");
         return -1;
     }
-    return wantedID;
+    return loggedUserId;
 }
 
-void overwriteUsersList (vector <User> &users) {
-
+void overwriteUsersList (vector <User> users) {
     fstream userList;
     userList.open("users.txt", ios::out | ios::trunc);
-
     for(size_t i = 0; i < users.size(); i++) {
         userList << users[i].id << '|' << users[i].login << '|' << users[i].password << endl;
     }
     userList.close();
 }
 
-void changePassword (int loggedUserId){
-
+void changePassword (int loggedUserId) {
     vector <User> users = loadAllUsers();
     int userPosition = findUserPosition(users, loggedUserId);
     string newPassword;
     cout << "Podaj nowe haslo" << endl;
     cin >> newPassword;
-
     users[userPosition].password = newPassword;
     cout << "Haslo zostalo zmienione!" << endl;
     overwriteUsersList(users);
@@ -473,12 +454,9 @@ void changePassword (int loggedUserId){
 }
 
 int addressBookMainMenu(int loggedUserId) {
-
     int contactCount = countAllContacts();
     int addressBookOptionNumber;
-    vector <Friend> friends;
-    loadData(friends, loggedUserId);
-
+    vector <Friend> friends = loadData(loggedUserId);
     while(1) {
         system("cls");
         cout << "KSIAZKA ADRESOWA by MOLTER IT SOLUTIONS " << endl;
@@ -557,7 +535,7 @@ int main() {
 
         case 1:
             loggedUserId = loginToAddressbook();
-            if(loggedUserId > 0){
+            if(loggedUserId > 0) {
                 addressBookMainMenu(loggedUserId);
             };
             break;
@@ -567,6 +545,10 @@ int main() {
         case 3:
             cout << "Do zobaczenia wkrotce :)" << endl;
             return 0;
+        default:
+            cout << "Wybierz wlasciwa pozycje menu!" << endl;
+            sleep(1);
+            break;
         }
     }
 }
