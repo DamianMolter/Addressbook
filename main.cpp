@@ -395,10 +395,9 @@ int checkCorrectLoginAndPassword(vector <User> users,string login,string passwor
     return loggedUserId;
 }
 
-int loginToAddressbook () {
+int loginToAddressbook (vector <User> users) {
     string login, password;
     int loggedUserId = -1;
-    vector <User> users = loadAllUsers();
     do {
         cout << "Podaj login (Wpisz 0 aby wrocic do glownego menu.):" << endl;
         cin >> login;
@@ -521,6 +520,7 @@ int main() {
 
     int loginMenuOptionNumber;
     int loggedUserId = -1;
+    vector <User> users = loadAllUsers();
 
     while(1) {
         system("cls");
@@ -534,7 +534,7 @@ int main() {
         switch(loginMenuOptionNumber) {
 
         case 1:
-            loggedUserId = loginToAddressbook();
+            loggedUserId = loginToAddressbook(users);
             if(loggedUserId > 0) {
                 addressBookMainMenu(loggedUserId);
             };
